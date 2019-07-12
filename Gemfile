@@ -11,7 +11,6 @@ gem 'coffee-rails', '~> 4.2'
 gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 
-gem 'pg', '>= 0.18', '< 2.0'
 gem 'mini_racer', platforms: :ruby
 gem 'bootsnap', '>= 1.1.0', require: false
 
@@ -34,7 +33,7 @@ group :test do
 end
 
 group :production do
-  gem 'pg', '0.20.0'
+  gem 'pg', '>= 0.18', '< 2.0'
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
