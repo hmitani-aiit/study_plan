@@ -1,0 +1,55 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-2">
+      <%= render "shared/sidenav" %>
+
+    </div>
+    <div class="col-sm-10">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">選べる科目</h3>
+        </div>
+        <div class="panel-body" style="min-height: 450px">
+          <table class="table table-striped table-hover">
+            <thead>
+
+            <tr>
+              <th>No.</th>
+              <th>科目</th>
+              <th>学期</th>
+              <th>曜日</th>
+              <th>時限</th>
+              <th>已选</th>
+              <th>専攻</th>
+              <th>授業方式</th>
+              <th>講師</th>
+
+            </tr>
+            </thead>
+            <tbody>
+
+            <% @courses.each do |course| %>
+                <tr>
+
+                  <td><%= course.course_code %></td>
+                  <td><%= course.name %></td>
+                  <td><%= course.credit %></td>
+                  <td><%= course.week %></td>
+                  <td><%= course.time %></td>
+                  <td><%= course.select %></td>
+                  <td><%= course.course_type %></td>
+                  <td><%= course.teaching_type %></td>
+                  <td><%= course.teacher.name %></td>
+                  <td><%= link_to "参加する", select_course_path(course), class: 'btn-sm btn-info' %></td>
+
+                </tr>
+            <% end %>
+            </tbody>
+          </table>
+          <%= will_paginate @courses %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
