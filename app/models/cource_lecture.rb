@@ -1,0 +1,2 @@
+class CourceLecture < ApplicationRecord
+end
