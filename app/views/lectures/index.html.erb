@@ -3,7 +3,29 @@
     <link rel="stylesheet" href="lectures.scss" type="text/css">
 </head>
 <body>
-    <% @lectures.each do |lecture| %>
-        <%= lecture[:name] %><br>
-    <% end %>
+  <table class="table table-striped">
+    <caption>授業一覧</caption>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th scope="col">名称</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @lectures.each_with_index do |lecture, idx| %>
+        <tr>
+          <th scope="row"><%= idx %></th>
+          <td><%= lecture[:name] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <script>
+    $("table").on("click", "tr td", function () {
+      var col = $(this).index();
+      if(col != 2){
+        console.log("OK");
+      }
+    });
+  </script>
 </body>
