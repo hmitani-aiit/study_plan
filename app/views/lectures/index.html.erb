@@ -1,0 +1,9 @@
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="lectures.scss" type="text/css">
+</head>
+<body>
+    <% @lectures.each do |lecture| %>
+        <%= lecture[:name] %><br>
+    <% end %>
+</body>
