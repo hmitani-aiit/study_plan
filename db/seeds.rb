@@ -2,12 +2,17 @@
 
 require "csv"
 
+cource = {}
+week = {}
+
 CSV.foreach('db/cource.csv') do |row|
   Cource.create(:id => row[0], :name => row[1])
+  cource.store(row[1], row[0])
 end
 
 CSV.foreach('db/week.csv') do |row|
   Week.create(:id => row[0], :name => row[1])
+  week.store(row[1], row[0])
 end
 
 lecture_id = 1
@@ -21,11 +26,12 @@ CSV.foreach('db/lecture.csv') do |row|
   column = 3
   count = 0
   while count < lecture_count do
-    week = row[column + 0]
+    week_name = row[column]
+    week_id = week[week_name]
     column += 1
-    period = row[column + 1]
+    period = row[column]
     column += 1
-    LecturePeriod.create(:lecture_id => lecture_id, :day_of_the_week => week, :period => period)
+    LecturePeriod.create(:lecture_id => lecture_id, :day_of_the_week => week_id, :period => period)
     count += 1
   end
 
@@ -34,7 +40,9 @@ CSV.foreach('db/lecture.csv') do |row|
 
   count = 0
   while count < cource_count do
-    cource_id = row[column]
+    cource_name = row[column]
+    cource_id = cource[cource_name]
+
     CourceLecture.create(:cource_id => cource_id, :lecture_id => lecture_id)
     count += 1
     column += 1
