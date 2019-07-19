@@ -1,0 +1,2 @@
+class LecturePeriod < ApplicationRecord
+end
