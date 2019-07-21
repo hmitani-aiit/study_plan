@@ -19,6 +19,8 @@ gem 'jbuilder', '~> 2.5'
 
 gem 'mini_racer', platforms: :ruby
 gem 'bootsnap', '>= 1.1.0', require: false
+gem 'will_paginate'
+gem 'bootstrap-will_paginate', '1.0.0'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
