@@ -20,8 +20,8 @@
       <% @lectures.each_with_index do |lecture, idx| %>
         <tr>
           <th scope="row"><%= lecture[:id] %></th>
-          <td><%= lecture[:name] %></td>
-          <td><%= lecture[:quarter] %></td>
+          <td class="name"><%= lecture[:name] %></td>
+          <td class="quarter"><%= lecture[:quarter] %></td>
           <% if @periods[lecture[:id]].length == 0 %>
           <td></td><td></td><td></td><td></td>
           <% elsif @periods[lecture[:id]].length == 1 %>
@@ -42,9 +42,13 @@
   <script>
     $("table").on("click", "tr td", function () {
       var col = $(this).index();
-      if(col != 2){
+      var row = $(this).closest('tr')[0];
+      if(row.rowIndex == 1){
         console.log("OK");
       }
+    });
+    $("table tr").each(function(index , elm){
+        console.log(index);
     });
   </script>
 </body>
