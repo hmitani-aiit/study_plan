@@ -2,6 +2,12 @@
 
 require "csv"
 
+Cource.delete_all
+Week.delete_all
+Lecture.delete_all
+LecturePeriod.delete_all
+CourceLecture.delete_all
+
 cource = {}
 week = {}
 
