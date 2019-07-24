@@ -9,13 +9,32 @@
       <tr>
         <th>#</th>
         <th scope="col">名称</th>
+        <th scope="col">クォーター</th>
+        <th scope="col">曜日</th>
+        <th scope="col">時間</th>
+        <th scope="col">曜日</th>
+        <th scope="col">時間</th>
       </tr>
     </thead>
     <tbody>
       <% @lectures.each_with_index do |lecture, idx| %>
         <tr>
-          <th scope="row"><%= idx %></th>
+          <th scope="row"><%= lecture[:id] %></th>
           <td><%= lecture[:name] %></td>
+          <td><%= lecture[:quarter] %></td>
+          <% if @periods[lecture[:id]].length == 0 %>
+          <td></td><td></td><td></td><td></td>
+          <% elsif @periods[lecture[:id]].length == 1 %>
+          <td><%= @periods[lecture[:id]][0].name %></td>
+          <td><%= @periods[lecture[:id]][0].period %></td>
+          <td></td>
+          <td></td>
+          <% else %>
+          <td><%= @periods[lecture[:id]][0].name %></td>
+          <td><%= @periods[lecture[:id]][0].period %></td>
+          <td><%= @periods[lecture[:id]][1].name %></td>
+          <td><%= @periods[lecture[:id]][1].period %></td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>
