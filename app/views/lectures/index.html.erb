@@ -2,14 +2,9 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="lectures.scss" type="text/css">
 </head>
-<table align="right">
-  <tr>
-    <td>
+<body>
       <input type="button" value="reload" onClick="onReloadClick()" />
       <input type="button" value="save" onClick="onSaveClick()" />
-    </td>
-  <tr>
-</table>
 <table class="table table-striped">
   <caption>授業一覧</caption>
   <thead>
@@ -30,48 +25,45 @@
     </tr>
   </thead>
   <tbody>
-    <% @lectures.each_with_index do |lecture, idx| %>
-      <tr>
-        <th scope="row"><%= lecture[:id] %></th>
-        <td class="name"><%= lecture[:name] %></td>
-        <td class="quarter"><%= lecture[:quarter] %></td>
-        <% if @periods[lecture[:id]].length == 0 %>
-          <td></td><td></td><td></td><td></td>
-        <% elsif @periods[lecture[:id]].length == 1 %>
-          <td><%= @periods[lecture[:id]][0].name %></td>
-          <td><%= @periods[lecture[:id]][0].period %></td>
-          <td></td>
-          <td></td>
-        <% else %>
-          <td><%= @periods[lecture[:id]][0].name %></td>
-          <td><%= @periods[lecture[:id]][0].period %></td>
-          <td><%= @periods[lecture[:id]][1].name %></td>
-          <td><%= @periods[lecture[:id]][1].period %></td>
-        <% end %>
-        <% for i in 1..6 %>
-          <td>
-          <% if @cources[lecture[:id]][i] %>
-            ◯
+      <% @lectures.each do |lecture| %>
+        <%  l = @periods[lecture[:id]].length %>
+        <tr>
+          <th scope="row"><%= lecture[:id] %></th>
+          <td class="name"><%= lecture[:name] %></td>
+          <td class="quarter"><%= lecture[:quarter] %></td>
+          <td class="week week1"><%= @periods[lecture[:id]][0].name if l%></td>
+          <td class="hour hour1"><%= @periods[lecture[:id]][0].period if l%></td>
+          <td class="week week2"><%= @periods[lecture[:id]][1].name if l == 2%></td>
+          <td class="hour hour2"><%= @periods[lecture[:id]][1].period if l == 2%></td>
+          <% for i in 1..6 %>
+            <td>
+              <% if @cources[lecture[:id]][i] %>
+                ◯
+              <% end %>
+            </td>
           <% end %>
-          </td>
-        <% end %>
-      </tr>
-    <% end %>
+        </tr>
+      <% end %>
   </tbody>
 </table>
 <script>
-  $("table").on("click", "tr td", function () {
-    var col = $(this).index();
-    var row = $(this).closest('tr')[0];
-    if(row.rowIndex == 1){
-      console.log("OK");
-    }
-  });
-  $("table tr").each(function(index , elm){
-      console.log(index);
-  });
+    $("tbody").on("click", "tr", function () {
+       if($(this).hasClass("success")){
+           $(this).removeClass("success");
+       } else if(! $(this).hasClass("danger")){
+           $(this).addClass("success");
+           var row = $(this).index();
+           $("tbody tr").each(function(index, elm){
+               if(index != row){
+	           $(this).addClass("danger");
+                   $(this).removeClass("success");
+	       }
+           })
+       };
+    });
   function onReloadClick() {
   }
   function onSaveClick() {
   }
 </script>
+</body>
