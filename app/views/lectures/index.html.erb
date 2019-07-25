@@ -1,8 +1,3 @@
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="lectures.scss" type="text/css">
-</head>
-<body>
       <input type="button" value="reload" onClick="onReloadClick()" />
       <input type="button" value="save" onClick="onSaveClick()" />
 <table class="table table-striped">
@@ -24,10 +19,10 @@
       <th scope="col">BA</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody data-1h="0" data-2h="0">
       <% @lectures.each do |lecture| %>
         <%  l = lecture.lecture_period.length %>
-        <tr>
+        <tr data-dup="0">
           <th scope="row"><%= lecture[:id] %></th>
           <td class="name"><%= lecture[:name] %></td>
           <td class="quarter"><%= lecture[:quarter] %></td>
@@ -36,7 +31,7 @@
           <td class="week week2"><%= lecture.lecture_period[1].week.name if l == 2%></td>
           <td class="hour hour2"><%= lecture.lecture_period[1].period if l == 2%></td>
           <% for i in 1..6 %>
-            <td>
+            <td class="cource<%= i %>">
               <% lecture.cource.each do |c| %>
                 <% if c.id == i then %>
                   ◯
@@ -50,15 +45,45 @@
 </table>
 <script>
     $("tbody").on("click", "tr", function () {
+       var cur_idx = $(this).index();
+       var cur_qtr = $(this).find(".quarter").text();
+       var cur_pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
+       var cur_pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
+       var cur_h = ((cur_qtr == "1" || cur_qtr == "2") ? "1": "2") + "h";
        if($(this).hasClass("success")){
            $(this).removeClass("success");
+           $("tbody").data(cur_h, $("tbody").data(cur_h) - 1)
+           $("tbody tr").each(function(index, elm){
+               if(index != cur_idx){
+                   if($(this).find(".quarter").text() == cur_qtr){
+                       var pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
+                       var pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
+                       if(cur_pe1 == pe1 || cur_pe1 == pe2 || (cur_pe2 != "" && (cur_pe2 == pe1 || cur_pe2 == pe2))){
+                           $(this).data("dup", $(this).data("dup") - 1)
+                           console.log($(this).data("dup"))
+                           if($(this).data("dup") == 0){
+                               $(this).removeClass("danger");
+                           }
+                       }
+                   }
+	       }
+           })
        } else if(! $(this).hasClass("danger")){
            $(this).addClass("success");
-           var row = $(this).index();
+           $("tbody").data(cur_h, $("tbody").data(cur_h) + 1)
+           console.log($("tbody").data(cur_h))
            $("tbody tr").each(function(index, elm){
-               if(index != row){
-	           $(this).addClass("danger");
-                   $(this).removeClass("success");
+               if(index != cur_idx){
+                   if($(this).find(".quarter").text() == cur_qtr){
+                       var pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
+                       var pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
+                       if(cur_pe1 == pe1 || cur_pe1 == pe2 || (cur_pe2 != "" && (cur_pe2 == pe1 || cur_pe2 == pe2))){
+                           $(this).addClass("danger");
+                           $(this).removeClass("success");
+                           $(this).data("dup", $(this).data("dup") + 1)
+                           console.log($(this).data("dup"))
+                       }
+                   }
 	       }
            })
        };
@@ -68,4 +93,3 @@
   function onSaveClick() {
   }
 </script>
-</body>
