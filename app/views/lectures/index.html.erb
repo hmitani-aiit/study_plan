@@ -31,8 +31,8 @@
           <th scope="row"><%= lecture[:id] %></th>
           <td class="name"><%= lecture[:name] %></td>
           <td class="quarter"><%= lecture[:quarter] %></td>
-          <td class="week week1"><%= lecture.lecture_period[0].week.name if l%></td>
-          <td class="hour hour1"><%= lecture.lecture_period[0].period if l%></td>
+          <td class="week week1"><%= lecture.lecture_period[0].week.name if l != 0%></td>
+          <td class="hour hour1"><%= lecture.lecture_period[0].period if l != 0%></td>
           <td class="week week2"><%= lecture.lecture_period[1].week.name if l == 2%></td>
           <td class="hour hour2"><%= lecture.lecture_period[1].period if l == 2%></td>
           <% for i in 1..6 %>
