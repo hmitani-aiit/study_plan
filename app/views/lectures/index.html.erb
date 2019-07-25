@@ -53,39 +53,67 @@
        if($(this).hasClass("success")){
            $(this).removeClass("success");
            $("tbody").data(cur_h, $("tbody").data(cur_h) - 1)
-           $("tbody tr").each(function(index, elm){
-               if(index != cur_idx){
-                   if($(this).find(".quarter").text() == cur_qtr){
-                       var pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
-                       var pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
-                       if(cur_pe1 == pe1 || cur_pe1 == pe2 || (cur_pe2 != "" && (cur_pe2 == pe1 || cur_pe2 == pe2))){
-                           $(this).data("dup", $(this).data("dup") - 1)
-                           console.log($(this).data("dup"))
+           console.log($("tbody").data(cur_h))
+           if($("tbody").data(cur_h) == 10){
+               $("tbody tr").each(function(index, elm){
+                   if(index != cur_idx){
+                       if( ($(this).hasClass("danger") )){
                            if($(this).data("dup") == 0){
-                               $(this).removeClass("danger");
+                               var qtr = $(this).find(".quarter").text();
+                               var h = ((qtr == "1" || qtr == "2") ? "1": "2") + "h";
+                               if(h == cur_h){
+                                   $(this).removeClass("danger");
+                               }
                            }
                        }
                    }
-	       }
-           })
+               })
+           }
+               $("tbody tr").each(function(index, elm){
+                   if(index != cur_idx){
+                       if($(this).find(".quarter").text() == cur_qtr){
+                           var pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
+                           var pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
+                           if(cur_pe1 == pe1 || cur_pe1 == pe2 || (cur_pe2 != "" && (cur_pe2 == pe1 || cur_pe2 == pe2))){
+                               $(this).data("dup", $(this).data("dup") - 1)
+                               console.log($(this).data("dup"))
+                               if($(this).data("dup") == 0){
+                                   $(this).removeClass("danger");
+                               }
+                           }
+                       }
+	           }
+               })
        } else if(! $(this).hasClass("danger")){
            $(this).addClass("success");
            $("tbody").data(cur_h, $("tbody").data(cur_h) + 1)
-           console.log($("tbody").data(cur_h))
-           $("tbody tr").each(function(index, elm){
-               if(index != cur_idx){
-                   if($(this).find(".quarter").text() == cur_qtr){
-                       var pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
-                       var pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
-                       if(cur_pe1 == pe1 || cur_pe1 == pe2 || (cur_pe2 != "" && (cur_pe2 == pe1 || cur_pe2 == pe2))){
-                           $(this).addClass("danger");
-                           $(this).removeClass("success");
-                           $(this).data("dup", $(this).data("dup") + 1)
-                           console.log($(this).data("dup"))
+           if($("tbody").data(cur_h) == 11){
+               $("tbody tr").each(function(index, elm){
+                   if(index != cur_idx){
+                       if(! ($(this).hasClass("danger") || $(this).hasClass("success"))){
+                           var qtr = $(this).find(".quarter").text();
+                           var h = ((qtr == "1" || qtr == "2") ? "1": "2") + "h";
+                           if(h == cur_h){
+                               $(this).addClass("danger");
+                           }
                        }
                    }
-	       }
-           })
+               })
+           }else{
+               $("tbody tr").each(function(index, elm){
+                   if(index != cur_idx){
+                       if($(this).find(".quarter").text() == cur_qtr){
+                           var pe1 = $(this).find(".week1").text() + $(this).find(".hour1").text();
+                           var pe2 = $(this).find(".week2").text() + $(this).find(".hour2").text();
+                           if(cur_pe1 == pe1 || cur_pe1 == pe2 || (cur_pe2 != "" && (cur_pe2 == pe1 || cur_pe2 == pe2))){
+                               $(this).addClass("danger");
+                               $(this).removeClass("success");
+                               $(this).data("dup", $(this).data("dup") + 1)
+                           }
+                       }
+    	           }
+               })
+           }
        };
     });
   function onReloadClick() {
