@@ -26,19 +26,21 @@
   </thead>
   <tbody>
       <% @lectures.each do |lecture| %>
-        <%  l = @periods[lecture[:id]].length %>
+        <%  l = lecture.lecture_period.length %>
         <tr>
           <th scope="row"><%= lecture[:id] %></th>
           <td class="name"><%= lecture[:name] %></td>
           <td class="quarter"><%= lecture[:quarter] %></td>
-          <td class="week week1"><%= @periods[lecture[:id]][0].name if l%></td>
-          <td class="hour hour1"><%= @periods[lecture[:id]][0].period if l%></td>
-          <td class="week week2"><%= @periods[lecture[:id]][1].name if l == 2%></td>
-          <td class="hour hour2"><%= @periods[lecture[:id]][1].period if l == 2%></td>
+          <td class="week week1"><%= lecture.lecture_period[0].week.name if l%></td>
+          <td class="hour hour1"><%= lecture.lecture_period[0].period if l%></td>
+          <td class="week week2"><%= lecture.lecture_period[1].week.name if l == 2%></td>
+          <td class="hour hour2"><%= lecture.lecture_period[1].period if l == 2%></td>
           <% for i in 1..6 %>
             <td>
-              <% if @cources[lecture[:id]][i] %>
-                ◯
+              <% lecture.cource.each do |c| %>
+                <% if c.id == i then %>
+                  ◯
+                <% end %>
               <% end %>
             </td>
           <% end %>
