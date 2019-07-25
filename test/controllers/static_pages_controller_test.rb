@@ -1,17 +1,17 @@
 require 'test_helper'
 
 class StaticPagesControllerTest < ActionDispatch::IntegrationTest
-
+	
   test "should get home" do
    get root_path
     assert_response :success
     assert_select "title", "Home | 履修計画"
   end
 
-  test "should get help" do
-    get help_path
+  test "should get Lectures" do
+    get lectures_path
     assert_response :success
-    assert_select "title", "Help | 履修計画"
+    assert_select "title", "履修計画"
   end
 
   test "should get about" do
