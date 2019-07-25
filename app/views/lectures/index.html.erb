@@ -52,7 +52,7 @@
        var cur_h = ((cur_qtr == "1" || cur_qtr == "2") ? "1": "2") + "h";
        if($(this).hasClass("success")){
            $(this).removeClass("success");
-           $("tbody").data(cur_h, $("tbody").data(chr_h) - 1)
+           $("tbody").data(cur_h, $("tbody").data(cur_h) - 1)
            $("tbody tr").each(function(index, elm){
                if(index != cur_idx){
                    if($(this).find(".quarter").text() == cur_qtr){
