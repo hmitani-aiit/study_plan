@@ -2,53 +2,76 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="lectures.scss" type="text/css">
 </head>
-<body>
-  <table class="table table-striped">
-    <caption>授業一覧</caption>
-    <thead>
+<table align="right">
+  <tr>
+    <td>
+      <input type="button" value="reload" onClick="onReloadClick()" />
+      <input type="button" value="save" onClick="onSaveClick()" />
+    </td>
+  <tr>
+</table>
+<table class="table table-striped">
+  <caption>授業一覧</caption>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th scope="col">名称</th>
+      <th scope="col">クォーター</th>
+      <th scope="col">曜日</th>
+      <th scope="col">時間</th>
+      <th scope="col">曜日</th>
+      <th scope="col">時間</th>
+      <th scope="col">ST</th>
+      <th scope="col">SA</th>
+      <th scope="col">PM</th>
+      <th scope="col">SM</th>
+      <th scope="col">TS</th>
+      <th scope="col">BA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @lectures.each_with_index do |lecture, idx| %>
       <tr>
-        <th>#</th>
-        <th scope="col">名称</th>
-        <th scope="col">クォーター</th>
-        <th scope="col">曜日</th>
-        <th scope="col">時間</th>
-        <th scope="col">曜日</th>
-        <th scope="col">時間</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @lectures.each_with_index do |lecture, idx| %>
-        <tr>
-          <th scope="row"><%= lecture[:id] %></th>
-          <td class="name"><%= lecture[:name] %></td>
-          <td class="quarter"><%= lecture[:quarter] %></td>
-          <% if @periods[lecture[:id]].length == 0 %>
+        <th scope="row"><%= lecture[:id] %></th>
+        <td class="name"><%= lecture[:name] %></td>
+        <td class="quarter"><%= lecture[:quarter] %></td>
+        <% if @periods[lecture[:id]].length == 0 %>
           <td></td><td></td><td></td><td></td>
-          <% elsif @periods[lecture[:id]].length == 1 %>
+        <% elsif @periods[lecture[:id]].length == 1 %>
           <td><%= @periods[lecture[:id]][0].name %></td>
           <td><%= @periods[lecture[:id]][0].period %></td>
           <td></td>
           <td></td>
-          <% else %>
+        <% else %>
           <td><%= @periods[lecture[:id]][0].name %></td>
           <td><%= @periods[lecture[:id]][0].period %></td>
           <td><%= @periods[lecture[:id]][1].name %></td>
           <td><%= @periods[lecture[:id]][1].period %></td>
+        <% end %>
+        <% for i in 1..6 %>
+          <td>
+          <% if @cources[lecture[:id]][i] %>
+            ◯
           <% end %>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-  <script>
-    $("table").on("click", "tr td", function () {
-      var col = $(this).index();
-      var row = $(this).closest('tr')[0];
-      if(row.rowIndex == 1){
-        console.log("OK");
-      }
-    });
-    $("table tr").each(function(index , elm){
-        console.log(index);
-    });
-  </script>
-</body>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<script>
+  $("table").on("click", "tr td", function () {
+    var col = $(this).index();
+    var row = $(this).closest('tr')[0];
+    if(row.rowIndex == 1){
+      console.log("OK");
+    }
+  });
+  $("table tr").each(function(index , elm){
+      console.log(index);
+  });
+  function onReloadClick() {
+  }
+  function onSaveClick() {
+  }
+</script>
