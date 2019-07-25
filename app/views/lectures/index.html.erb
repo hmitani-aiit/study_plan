@@ -14,6 +14,12 @@
         <th scope="col">時間</th>
         <th scope="col">曜日</th>
         <th scope="col">時間</th>
+        <th scope="col">ST</th>
+        <th scope="col">SA</th>
+        <th scope="col">PM</th>
+        <th scope="col">SM</th>
+        <th scope="col">TS</th>
+        <th scope="col">BA</th>
       </tr>
     </thead>
     <tbody>
@@ -34,6 +40,13 @@
           <td><%= @periods[lecture[:id]][0].period %></td>
           <td><%= @periods[lecture[:id]][1].name %></td>
           <td><%= @periods[lecture[:id]][1].period %></td>
+          <% end %>
+          <% for i in 1..6 %>
+          <td>
+          <% if @cources[lecture[:id]][i] %>
+          ◯
+          <% end %>
+          </td>
           <% end %>
         </tr>
       <% end %>
