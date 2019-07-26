@@ -93,6 +93,11 @@
             }
         })
     }
+    function clearHdr(hdr){
+        hdr.removeClass("danger");
+        hdr.removeClass("success");
+        hdr.data("num",0);
+    }
     function clearRow(row){
         row.removeClass("danger");
         row.removeClass("success");
@@ -103,6 +108,9 @@
         $("tbody").data("2h", 0);
         $("tbody tr").each(function(index, elm){
             clearRow($(this));
+        });
+        $("thead th").each(function(index, elm){
+            clearHdr($(this));
         });
     }
     $("tbody").on("click", "tr", function () {
