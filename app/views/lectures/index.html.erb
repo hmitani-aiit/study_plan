@@ -1,7 +1,7 @@
       <input type="button" value="reload" onClick="onReloadClick()" />
       <input type="button" value="save" onClick="onSaveClick()" />
 <table id="lecture-table" class="table table-striped">
-  <caption>授業一覧</caption>
+  <caption>授業一覧 <%= @current_user.name %></caption>
   <thead>
     <tr>
       <th>#</th>
