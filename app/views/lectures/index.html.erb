@@ -23,7 +23,7 @@
     <tbody data-1h="0" data-2h="0">
         <% @lectures.each do |lecture| %>
           <%  l = lecture.lecture_period.length %>
-          <tr data-dup="0" class="<% @current_user.lecture.each do |l| if l.id == lecture[:id] then %>success<% end end %>">
+          <tr data-dup="0" class="<%= "initial_select" if lecture.user_id %>">
             <th scope="row"><%= lecture[:id] %></th>
             <td class="name"><%= lecture[:name] %></td>
             <td class="quarter"><%= lecture[:quarter] %></td>
@@ -117,6 +117,13 @@
             clearHdr($(this));
         });
     }
+    function initTable(){
+        $("tbody tr").each(function(index, elm){
+            if ($(this).hasClass("initial_select")){
+                toggleRow($(this));
+            }
+        });
+    }
     $("tbody").on("click", "tr", function () {
        if($(this).hasClass("success") || ! $(this).hasClass("danger")){
            toggleRow($(this));
@@ -124,10 +131,29 @@
     });
   function onReloadClick() {
     clearTable();
+    initTable();
   }
   function onSaveClick() {
+    var lectures = [];
+    $("tbody tr").each(function(index, elm){
+        if($(this).hasClass("success")){
+            lectures.push($(this).find("th").text());
+        }
+    });
+    $.ajax({
+        type:"post",
+        url:"/lectures",
+        data: {lectures: lectures},
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("X-CSRF-Token", $('meta[name="csrf-token"]').attr('content'))
+        },
+    }).then(
+          function(data) { /* alert('success!!'); */ },
+          function(data) { /* alert('error!!');  */  }
+    );
   }
   jQuery(function($){
       $("#lecture-table").DataTable({paging: false});
+      initTable();
   });
 </script>
