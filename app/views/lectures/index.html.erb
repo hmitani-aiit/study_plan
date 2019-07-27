@@ -1,42 +1,46 @@
       <input type="button" value="reload" onClick="onReloadClick()" />
       <input type="button" value="save" onClick="onSaveClick()" />
-<table id="lecture-table" class="table table-striped">
-  <caption>授業一覧 <%= @current_user.name %></caption>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th scope="col">名称</th>
-      <th scope="col">クォーター</th>
-      <th scope="col">曜日</th>
-      <th scope="col">時間</th>
-      <th scope="col">曜日</th>
-      <th scope="col">時間</th>
-      <th scope="col" class="cource1" data-num="0">ST</th>
-      <th scope="col" class="cource2" data-num="0">SA</th>
-      <th scope="col" class="cource3" data-num="0">PM</th>
-      <th scope="col" class="cource4" data-num="0">SM</th>
-      <th scope="col" class="cource5" data-num="0">TS</th>
-      <th scope="col" class="cource6" data-num="0">BA</th>
-    </tr>
-  </thead>
-  <tbody data-1h="0" data-2h="0">
-      <% @lectures.each do |lecture| %>
-        <%  l = lecture.lecture_period.length %>
-        <tr data-dup="0">
-          <th scope="row"><%= lecture[:id] %></th>
-          <td class="name"><%= lecture[:name] %></td>
-          <td class="quarter"><%= lecture[:quarter] %></td>
-          <td class="week week1"><%= lecture.lecture_period[0].week.name if l != 0%></td>
-          <td class="hour hour1"><%= lecture.lecture_period[0].period if l != 0%></td>
-          <td class="week week2"><%= lecture.lecture_period[1].week.name if l == 2%></td>
-          <td class="hour hour2"><%= lecture.lecture_period[1].period if l == 2%></td>
-          <% for i in 1..6 %>
-            <td class="cource<%= i %>"><% lecture.cource.each do |c| if c.id == i then %>◯<% end  end %></td>
-          <% end %>
-        </tr>
-      <% end %>
-  </tbody>
-</table>
+<% if logged_in? %>
+  <table id="lecture-table" class="table table-striped">
+    <caption>授業一覧 <%= @current_user.name %></caption>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th scope="col">名称</th>
+        <th scope="col">クォーター</th>
+        <th scope="col">曜日</th>
+        <th scope="col">時間</th>
+        <th scope="col">曜日</th>
+        <th scope="col">時間</th>
+        <th scope="col" class="cource1" data-num="0">ST</th>
+        <th scope="col" class="cource2" data-num="0">SA</th>
+        <th scope="col" class="cource3" data-num="0">PM</th>
+        <th scope="col" class="cource4" data-num="0">SM</th>
+        <th scope="col" class="cource5" data-num="0">TS</th>
+        <th scope="col" class="cource6" data-num="0">BA</th>
+      </tr>
+    </thead>
+    <tbody data-1h="0" data-2h="0">
+        <% @lectures.each do |lecture| %>
+          <%  l = lecture.lecture_period.length %>
+          <tr data-dup="0">
+            <th scope="row"><%= lecture[:id] %></th>
+            <td class="name"><%= lecture[:name] %></td>
+            <td class="quarter"><%= lecture[:quarter] %></td>
+            <td class="week week1"><%= lecture.lecture_period[0].week.name if l != 0%></td>
+            <td class="hour hour1"><%= lecture.lecture_period[0].period if l != 0%></td>
+            <td class="week week2"><%= lecture.lecture_period[1].week.name if l == 2%></td>
+            <td class="hour hour2"><%= lecture.lecture_period[1].period if l == 2%></td>
+            <% for i in 1..6 %>
+              <td class="cource<%= i %>"><% lecture.cource.each do |c| if c.id == i then %>◯<% end  end %></td>
+            <% end %>
+          </tr>
+        <% end %>
+    </tbody>
+  </table>
+<% else %>
+    ログインしてね！
+<% end %>
 <script>
     function getParams(row){
         idx = row.index();
