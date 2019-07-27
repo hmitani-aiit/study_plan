@@ -134,6 +134,23 @@
     initTable();
   }
   function onSaveClick() {
+    var lectures = [];
+    $("tbody tr").each(function(index, elm){
+        if($(this).hasClass("success")){
+            lectures.push($(this).find("th").text());
+        }
+    });
+    $.ajax({
+        type:"post",
+        url:"/lectures",
+        data: {lectures: lectures},
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("X-CSRF-Token", $('meta[name="csrf-token"]').attr('content'))
+        },
+    }).then(
+          function(data) { /* alert('success!!'); */ },
+          function(data) { /* alert('error!!');  */  }
+    );
   }
   jQuery(function($){
       $("#lecture-table").DataTable({paging: false});
