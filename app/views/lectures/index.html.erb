@@ -23,7 +23,7 @@
     <tbody data-1h="0" data-2h="0">
         <% @lectures.each do |lecture| %>
           <%  l = lecture.lecture_period.length %>
-          <tr data-dup="0">
+          <tr data-dup="0" class="<% @current_user.lecture.each do |l| if l.id == lecture[:id] then %>success<% end end %>">
             <th scope="row"><%= lecture[:id] %></th>
             <td class="name"><%= lecture[:name] %></td>
             <td class="quarter"><%= lecture[:quarter] %></td>
