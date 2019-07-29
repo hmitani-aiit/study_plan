@@ -151,6 +151,13 @@
           function(data) { /* alert('success!!'); */ },
           function(data) { /* alert('error!!');  */  }
     );
+    $("tbody tr").each(function(index, elm){
+        if($(this).hasClass("success")){
+            $(this).addClass("initial_select");
+        }else{
+            $(this).removeClass("initial_select");
+        }
+    });
   }
   jQuery(function($){
       $("#lecture-table").DataTable({paging: false});
