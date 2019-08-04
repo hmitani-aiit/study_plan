@@ -12,12 +12,12 @@
         <th scope="col">時間</th>
         <th scope="col">曜日</th>
         <th scope="col">時間</th>
-        <th scope="col" class="cource1" data-num="0">ST</th>
-        <th scope="col" class="cource2" data-num="0">SA</th>
-        <th scope="col" class="cource3" data-num="0">PM</th>
-        <th scope="col" class="cource4" data-num="0">SM</th>
-        <th scope="col" class="cource5" data-num="0">TS</th>
-        <th scope="col" class="cource6" data-num="0">BA</th>
+        <th scope="col" class="cource1" data-num="0">ST<br/><span>0</span></th>
+        <th scope="col" class="cource2" data-num="0">SA<br/><span>0</span></th>
+        <th scope="col" class="cource3" data-num="0">PM<br/><span>0</span></th>
+        <th scope="col" class="cource4" data-num="0">SM<br/><span>0</span></th>
+        <th scope="col" class="cource5" data-num="0">TS<br/><span>0</span></th>
+        <th scope="col" class="cource6" data-num="0">BA<br/><span>0</span></th>
       </tr>
     </thead>
     <tbody data-1h="0" data-2h="0">
@@ -121,12 +121,14 @@
         $("tbody tr").each(function(index, elm){
             if ($(this).hasClass("initial_select")){
                 toggleRow($(this));
+                set_row_summary(elm);
             }
         });
     }
     $("tbody").on("click", "tr", function () {
        if($(this).hasClass("success") || ! $(this).hasClass("danger")){
            toggleRow($(this));
+          set_row_summary(this);
        }
     });
   function onReloadClick() {
