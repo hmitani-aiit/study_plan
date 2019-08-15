@@ -23,7 +23,7 @@
     <tbody data-1h="0" data-2h="0">
         <% @lectures.each do |lecture| %>
           <%  l = lecture.lecture_period.length %>
-          <tr data-dup="0" class="<%= "initial_select" if lecture.user_id %>">
+          <tr data-dup="0" class="<%= "initial_select" if lecture.result %>">
             <th scope="row"><%= lecture[:id] %></th>
             <td class="name"><%= lecture[:name] %></td>
             <td class="quarter"><%= lecture[:quarter] %></td>
