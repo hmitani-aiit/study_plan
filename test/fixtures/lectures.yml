@@ -4,8 +4,15 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+lec1:
+  name: フレームワーク開発特論
+  quarter: 1
+lec2:
+  name: 情報セキュリティ特論
+  quarter: 2
+lec3:
+  name: 情報アーキテクチャ特論3
+  quarter: 3
+lec4:
+  name: 情報インタフェースデザイン特論
+  quarter: 4

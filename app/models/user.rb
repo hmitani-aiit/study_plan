@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
-  has_many :user_lecture
+  has_many :user_lecture, dependent: :delete_all
   has_many :lecture, through: :user_lecture
 
   # 渡された文字列のハッシュ値を返す
