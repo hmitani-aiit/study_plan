@@ -118,17 +118,18 @@
         });
     }
     function initTable(){
+        clearSummary()
         $("tbody tr").each(function(index, elm){
             if ($(this).hasClass("initial_select")){
                 toggleRow($(this));
-                set_row_summary(elm);
+                setRowSummary(elm);
             }
         });
     }
     $("tbody").on("click", "tr", function () {
        if($(this).hasClass("success") || ! $(this).hasClass("danger")){
            toggleRow($(this));
-          set_row_summary(this);
+          setRowSummary(this);
        }
     });
   function onReloadClick() {
