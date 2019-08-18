@@ -2,25 +2,29 @@ class LecturesController < ApplicationController
   def index 
     @current_user = User.includes(:lecture).find_by(id: session[:user_id])
 =begin
-SELECT lectures.*, user_lectures.user_id
+SELECT lectures.*, user_lectures.result
     FROM "lectures"
     LEFT OUTER JOIN user_lectures ON lectures.id = user_lectures.lecture_id
-        AND user_lectures.user_id = 1
+        AND user_lectures.user_id = ?
     ORDER BY "lectures"."quarter" ASC
 =end
     @lectures = Lecture
         .includes([:week, :cource])
-        .select("lectures.*, user_lectures.user_id")
+        .select("lectures.*, user_lectures.result")
         .joins("LEFT OUTER JOIN user_lectures ON lectures.id = user_lectures.lecture_id AND user_lectures.user_id = #{session[:user_id]}")
         .order(:quarter)
   end
 
   def save
-    @current_user = User.includes(:user_lecture).find_by(id: session[:user_id])
-    @current_user.lecture.destroy_all
-    lectures = params[:lectures]
-    lectures.each do |lecture|
-        @current_user.user_lecture.create(lecture_id: lecture)
+    current_user = User.find_by(id: session[:user_id])
+    current_user.transaction do
+      current_user.user_lecture.update_all(result: nil)
+      lectures = params[:lectures]
+      # empty array should be nil on rails 4.1 or newer.
+      lectures && lectures.each do |lecture|
+          l = current_user.user_lecture.find_or_initialize_by(lecture_id: lecture)
+          l.update_attribute(:result, 5)
+      end
     end
   end
 end

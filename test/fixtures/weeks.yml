@@ -4,8 +4,17 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+sun:
+  name: 日
+mon:
+  name: 月
+tue:
+  name: 火
+wed:
+  name: 水
+thu:
+  name: 木
+fri:
+  name: 金
+sat:
+  name: 土
