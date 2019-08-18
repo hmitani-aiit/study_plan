@@ -159,7 +159,7 @@
         }
     });
   }
-  jQuery(function($){
+  $(window).on('load',function(){
       $("#lecture-table").DataTable({paging: false});
       initTable();
   });
