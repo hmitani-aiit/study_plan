@@ -22,8 +22,8 @@ SELECT lectures.*, user_lectures.result
       lectures = params[:lectures]
       # empty array should be nil on rails 4.1 or newer.
       lectures && lectures.each do |lecture|
-          l = current_user.user_lecture.find_or_initialize_by(lecture_id: lecture)
-          l.update_attribute(:result, 5)
+          l = current_user.user_lecture.find_or_initialize_by(lecture_id: lecture[:id])
+          l.update_attribute(:result, lecture[:result])
       end
     end
   end
