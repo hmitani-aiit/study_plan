@@ -27,16 +27,19 @@
     location.reload();
   }
   function onSaveClick() {
-    var lectures = [];
+    var data = {};
+    data.lectures = [];
     table().data().each(function(e){
       if(e.result){
-        lectures.push(e.id);
+        data.lectures.push({id: e.id, result: e.result});
       }
     });
     $.ajax({
       type:"post",
       url:"/lectures",
-      data: {lectures: lectures},
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify(data),
       beforeSend: function(xhr) {
         xhr.setRequestHeader("X-CSRF-Token", $('meta[name="csrf-token"]').attr('content'))
       },
@@ -50,8 +53,10 @@
       cur = table().row(this).data();
       if(cur.result){
         $(this).addClass("success");
+        $(this).find(".resultbox").css("visibility","visible");
       } else {
         $(this).removeClass("success");
+        $(this).find(".resultbox").css("visibility","hidden");
         dup = table().data().filter(function(e){
           return e.result && is_collision(cur, e);
         }).count();
@@ -64,8 +69,12 @@
     });
     for(i=1; i<7;i++){
       c = "cource" + i;
-      count = table().data().filter(function(e){ return e.result && e[c]; }).count();
-      $("th."+c).find('span').text(count);
+      results =  table().data().filter(function(e){ return e.result >= 2 && e[c]; }).sort(function(e1,e2){return e2.result - e1.result;});
+      count = results.count();
+      avg = Math.round(Array.prototype.slice.call(results,0,7).reduce(function(prev, cur, i, arr) {
+        return prev+cur.result;
+      },0) / 7 *10)/10;
+      $("th."+c).find('span').text(`${count}(${avg})`);
       if(count >= 7){
         $("th."+c).addClass("success");
         $("th."+c).removeClass("danger");
@@ -101,8 +110,15 @@
                 "render": function ( data, type, row ) {
                     return data ? "〇":"";
                 },
-                "targets": [7,8,9,10,11,12]
+                "targets": [8,9,10,11,12,13]
             },
+            {
+                "render": function ( data, type, row ) {
+                    return `<input class="resultbox" style="visibility:hidden;" type="number" step="1" min="0" max="5" value="${data?data:5}" size="1"/>`;
+                },
+                "targets": [7]
+            },
+
         ],
         columns: [
           { title: "#", data: 'id' },
@@ -112,21 +128,35 @@
           { title: "時間", data: 'hour1' },
           { title: "曜日", data: 'week2' },
           { title: "時間", data: 'hour2' },
-          { title: "ST<br/><span>0</span>", data: 'cource1', className: "cource1" },
-          { title: "SA<br/><span>0</span>", data: 'cource2', className: "cource2" },
-          { title: "PM<br/><span>0</span>", data: 'cource3', className: "cource3" },
-          { title: "SM<br/><span>0</span>", data: 'cource4', className: "cource4" },
-          { title: "TS<br/><span>0</span>", data: 'cource5', className: "cource5" },
-          { title: "BA<br/><span>0</span>", data: 'cource6', className: "cource6" },
+          { title: "成績", data: 'result', className: "result" },
+          { title: "ST<br/><span>0(0)</span>", data: 'cource1', className: "cource1" },
+          { title: "SA<br/><span>0(0)</span>", data: 'cource2', className: "cource2" },
+          { title: "PM<br/><span>0(0)</span>", data: 'cource3', className: "cource3" },
+          { title: "SM<br/><span>0(0)</span>", data: 'cource4', className: "cource4" },
+          { title: "TS<br/><span>0(0)</span>", data: 'cource5', className: "cource5" },
+          { title: "BA<br/><span>0(0)</span>", data: 'cource6', className: "cource6" },
         ],
         paging: false
       });
-      $("tbody").on("click", "tr", function () {
-         if($(this).hasClass("success") || ! $(this).hasClass("danger")){
-           data = table().row(this).data();
-           data.result = data.result ? null : 5;
-           updateDOM();
-         }
+      $("tbody").on("click", "td", function () {
+         if(!$(this).hasClass("result")){
+           tr = $(this).closest('tr')[0];
+           if($(tr).hasClass("success") || ! $(tr).hasClass("danger")){
+             data = table().row(tr).data();
+             data.result = data.result ? null : 5;
+             updateDOM();
+           }
+        }
+      });
+      $(".resultbox").change(function(){
+        tr = $(this).closest('tr')[0];
+        data = table().row(tr).data();
+        if(parseInt($(this).val()) < 0 || parseInt($(this).val()) > 5){
+          $(this).val(data.result?data.result:5);
+        }else{
+          data.result = parseInt($(this).val());
+          updateDOM();
+        }
       });
       updateDOM();
   });
