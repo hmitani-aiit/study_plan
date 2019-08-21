@@ -3,17 +3,44 @@
 <% if logged_in? %>
   <table id="lecture-table" class="table table-striped"></table>
 <script>
+  /**
+   * DataTable のインスタンスを取得
+   *
+   * @return {DataTable} DataTable インスタンス
+   */
   function table(){
     return $('#lecture-table').DataTable();
   }
+
+  /**
+   * 学期を計算
+   *
+   * @param {Object} data 授業データ
+   * @return {number} 学期
+   */
   function semester(data){
     return ((data.quarter - 1) / 2 | 0);
   }
+
+  /**
+   * 指定した学期の履修数
+   *
+   * @param {number} s 学期
+   * @return {number} 履修数
+   */
   function lectures_per_semester(s){
     return num_semester = table().data().filter(function(e){
-      return (semester(e) == s) && e.result;
+      return (semester(e) == s) && e.result != null;
     }).count();
   }
+
+  /**
+   * 授業時間の重複を判定
+   *
+   * @param {Object} data1 重複を判定する授業
+   * @param {Object} data2 比較対象となる授業
+   * @return {boolean} 履修数
+   */
   function is_collision(data1, data2){
     return (data1.id != data2.id && data1.quarter == data2.quarter && (
            (data1.week1 == data2.week1 && data1.hour1 == data2.hour1) ||
@@ -22,15 +49,27 @@
              (data1.week2 == data2.week1 && data1.hour2 == data2.hour1) ||
              (data1.week2 == data2.week2 && data1.hour2 == data2.hour1)))));
   }
+
+  /**
+   * データのリロード
+   *
+   */
   function onReloadClick() {
-    /* FIX ME: to be ajax */
-    location.reload();
+    table().ajax.reload(function(){
+      connect_resultbox_cb();
+      updateDOM()
+    });
   }
+
+  /**
+   * データのセーブ
+   *
+   */
   function onSaveClick() {
     var data = {};
     data.lectures = [];
     table().data().each(function(e){
-      if(e.result){
+      if(e.result != null){
         data.lectures.push({id: e.id, result: e.result});
       }
     });
@@ -48,17 +87,22 @@
       function(data) { /* alert('error!!');  */  }
     );
   }
+
+  /**
+   * 授業データ構造に合わせて画面を更新
+   *
+   */
   function updateDOM(){
     $("tbody tr").each(function(index, elm){
       cur = table().row(this).data();
-      if(cur.result){
+      if(cur.result != null){
         $(this).addClass("success");
         $(this).find(".resultbox").css("visibility","visible");
       } else {
         $(this).removeClass("success");
         $(this).find(".resultbox").css("visibility","hidden");
         dup = table().data().filter(function(e){
-          return e.result && is_collision(cur, e);
+          return e.result != null && is_collision(cur, e);
         }).count();
         if(lectures_per_semester(semester(cur)) == 11 || dup > 0){
           $(this).addClass("danger");
@@ -68,7 +112,7 @@
       }
     });
     for(i=1; i<7;i++){
-      c = "cource" + i;
+      c = "course" + i;
       results =  table().data().filter(function(e){ return e.result >= 2 && e[c]; }).sort(function(e1,e2){return e2.result - e1.result;});
       count = results.count();
       avg = Math.round(Array.prototype.slice.call(results,0,7).reduce(function(prev, cur, i, arr) {
@@ -84,81 +128,104 @@
       }
     }
   }
-  data = [
-    <% @lectures.each do |lecture| %>
-    <%  l = lecture.lecture_period.length %>
-    {
-      "id":	<%= lecture[:id] %>,
-      "name":   "<%= lecture[:name] %>",
-      "quarter":<%= lecture[:quarter] %>,
-      "week1":  <%= l != 0 ? raw('"' + lecture.lecture_period[0].week.name + '"') : "null"%>,
-      "hour1":  <%= l != 0 ? lecture.lecture_period[0].period : "null"%>,
-      "week2":  <%= l == 2 ? raw('"' + lecture.lecture_period[1].week.name + '"') : "null"%>,
-      "hour2":  <%= l == 2 ? lecture.lecture_period[1].period : "null"%>,
-      <% for i in 1..6 %>
-      "cource<%= i %>": <%= lecture.cource.find(){|item| item.id == i } ? "true" : "false" %>,
-      <% end %>
-      "result": <%= lecture.result ? lecture.result : "null" %>
-    },
-    <% end %>
-  ];
-  $(window).on('load',function(){
-      $("#lecture-table").DataTable({
-        data: data,
-        columnDefs: [
-            {
-                "render": function ( data, type, row ) {
-                    return data ? "〇":"";
-                },
-                "targets": [8,9,10,11,12,13]
-            },
-            {
-                "render": function ( data, type, row ) {
-                    return `<input class="resultbox" style="visibility:hidden;" type="number" step="1" min="0" max="5" value="${data?data:5}" size="1"/>`;
-                },
-                "targets": [7]
-            },
 
-        ],
-        columns: [
-          { title: "#", data: 'id' },
-          { title: "名称", data: 'name' },
-          { title: "クォーター", data: 'quarter' },
-          { title: "曜日", data: 'week1' },
-          { title: "時間", data: 'hour1' },
-          { title: "曜日", data: 'week2' },
-          { title: "時間", data: 'hour2' },
-          { title: "成績", data: 'result', className: "result" },
-          { title: "ST<br/><span>0(0)</span>", data: 'cource1', className: "cource1" },
-          { title: "SA<br/><span>0(0)</span>", data: 'cource2', className: "cource2" },
-          { title: "PM<br/><span>0(0)</span>", data: 'cource3', className: "cource3" },
-          { title: "SM<br/><span>0(0)</span>", data: 'cource4', className: "cource4" },
-          { title: "TS<br/><span>0(0)</span>", data: 'cource5', className: "cource5" },
-          { title: "BA<br/><span>0(0)</span>", data: 'cource6', className: "cource6" },
-        ],
-        paging: false
-      });
-      $("tbody").on("click", "td", function () {
-         if(!$(this).hasClass("result")){
-           tr = $(this).closest('tr')[0];
-           if($(tr).hasClass("success") || ! $(tr).hasClass("danger")){
-             data = table().row(tr).data();
-             data.result = data.result ? null : 5;
-             updateDOM();
-           }
-        }
-      });
-      $(".resultbox").change(function(){
-        tr = $(this).closest('tr')[0];
-        data = table().row(tr).data();
-        if(parseInt($(this).val()) < 0 || parseInt($(this).val()) > 5){
-          $(this).val(data.result?data.result:5);
-        }else{
-          data.result = parseInt($(this).val());
-          updateDOM();
-        }
-      });
-      updateDOM();
+  /**
+   * コース用レンダラ
+   *
+   * @param {Object} data rawデータ (true か false)
+   * @return {string} セルに描画する内容(〇か空)
+   */
+  function course_render(data){
+    return data ? "〇":"";
+  }
+
+  /**
+   * 成績用レンダラ
+   *
+   * @param {Object} data rawデータ (0～5 or null の成績データ)
+   * @return {string} セルに描画する内容(入力ボックスの html 断片)
+   */
+  function result_render(data){
+    return `<input class="resultbox" style="visibility:hidden;" type="number" step="1" min="0" max="5" value="${data != null?data:5}" size="1"/>`;
+  }
+
+  /**
+    * 成績入力箱変更コールバック
+    * 入力内容をバリデーションしてから画面更新
+    *
+    */
+  function connect_resultbox_cb(){
+    $(".resultbox").change(function(){
+      tr = $(this).closest('tr')[0];
+      data = table().row(tr).data();
+      if(parseInt($(this).val()) < 0 || parseInt($(this).val()) > 5){
+        $(this).val(data.result!=null?data.result:5);
+      }else{
+        data.result = parseInt($(this).val());
+        updateDOM();
+      }
+    });
+  }
+
+  /**
+   * DataTable 初期化処理
+   *
+   */
+  $("#lecture-table").DataTable({
+      ajax: '/lectures_data',
+
+      /**
+       * 初期化コールバック
+       * ajax で取り込んだ表の初期化が完了した時点で発火
+       *
+       */
+      initComplete: function(settings, json) {
+
+        /**
+         * 行クリックコールバック
+         * データ構造を更新してから画面更新
+         *
+         */
+        $("tbody").on("click", "td", function () {
+           if(!$(this).hasClass("result")){
+             tr = $(this).closest('tr')[0];
+             if($(tr).hasClass("success") || ! $(tr).hasClass("danger")){
+               data = table().row(tr).data();
+               data.result = data.result !=null ? null : 5;
+               updateDOM();
+             }
+          }
+          connect_resultbox_cb();
+        });
+        updateDOM();
+      },
+      columns: [
+        { title: "#", data: 'id' },
+        { title: "名称", data: 'name' },
+        { title: "Q", data: 'quarter' },
+        { title: "曜日", data: 'week1' },
+        { title: "時間", data: 'hour1' },
+        { title: "曜日", data: 'week2' },
+        { title: "時間", data: 'hour2' },
+        { title: "成績", data: 'result', className: "result", render: result_render },
+        { title: "ST<br/><span>0(0)</span>", data: 'course1', className: "course1", render: course_render },
+        { title: "SA<br/><span>0(0)</span>", data: 'course2', className: "course2", render: course_render },
+        { title: "PM<br/><span>0(0)</span>", data: 'course3', className: "course3", render: course_render },
+        { title: "SM<br/><span>0(0)</span>", data: 'course4', className: "course4", render: course_render },
+        { title: "TS<br/><span>0(0)</span>", data: 'course5', className: "course5", render: course_render },
+        { title: "BA<br/><span>0(0)</span>", data: 'course6', className: "course6", render: course_render },
+      ],
+      paging: false
+    });
+
+  /**
+   * 進む/戻る対策 検知したら reload する...
+   *
+   */
+  window.addEventListener('popstate',function(e){
+    if (e.state) {
+      location.reload();
+    }
   });
 </script>
 <% else %>

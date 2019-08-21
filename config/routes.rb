@@ -10,5 +10,6 @@ Rails.application.routes.draw do
   resources :users
 
   get    '/lectures',   to: 'lectures#index'
+  get    '/lectures_data',   to: 'lectures#data'
   post    '/lectures',  to: 'lectures#save'
 end
