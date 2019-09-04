@@ -1,169 +1,233 @@
       <input type="button" value="reload" onClick="onReloadClick()" />
       <input type="button" value="save" onClick="onSaveClick()" />
 <% if logged_in? %>
-  <table id="lecture-table" class="table table-striped">
-    <caption>授業一覧 <%= @current_user.name %></caption>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th scope="col">名称</th>
-        <th scope="col">クォーター</th>
-        <th scope="col">曜日</th>
-        <th scope="col">時間</th>
-        <th scope="col">曜日</th>
-        <th scope="col">時間</th>
-        <th scope="col" class="cource1" data-num="0">ST<br/><span>0</span></th>
-        <th scope="col" class="cource2" data-num="0">SA<br/><span>0</span></th>
-        <th scope="col" class="cource3" data-num="0">PM<br/><span>0</span></th>
-        <th scope="col" class="cource4" data-num="0">SM<br/><span>0</span></th>
-        <th scope="col" class="cource5" data-num="0">TS<br/><span>0</span></th>
-        <th scope="col" class="cource6" data-num="0">BA<br/><span>0</span></th>
-      </tr>
-    </thead>
-    <tbody data-1h="0" data-2h="0">
-        <% @lectures.each do |lecture| %>
-          <%  l = lecture.lecture_period.length %>
-          <tr data-dup="0" class="<%= "initial_select" if lecture.result %>">
-            <th scope="row"><%= lecture[:id] %></th>
-            <td class="name"><%= lecture[:name] %></td>
-            <td class="quarter"><%= lecture[:quarter] %></td>
-            <td class="week week1"><%= lecture.lecture_period[0].week.name if l != 0%></td>
-            <td class="hour hour1"><%= lecture.lecture_period[0].period if l != 0%></td>
-            <td class="week week2"><%= lecture.lecture_period[1].week.name if l == 2%></td>
-            <td class="hour hour2"><%= lecture.lecture_period[1].period if l == 2%></td>
-            <% for i in 1..6 %>
-              <td class="cource<%= i %>"><% lecture.cource.each do |c| if c.id == i then %>◯<% end  end %></td>
-            <% end %>
-          </tr>
-        <% end %>
-    </tbody>
-  </table>
+  <table id="lecture-table" class="table table-striped"></table>
+<script>
+  /**
+   * DataTable のインスタンスを取得
+   *
+   * @return {DataTable} DataTable インスタンス
+   */
+  function table(){
+    return $('#lecture-table').DataTable();
+  }
+
+  /**
+   * 学期を計算
+   *
+   * @param {Object} data 授業データ
+   * @return {number} 学期
+   */
+  function semester(data){
+    return ((data.quarter - 1) / 2 | 0);
+  }
+
+  /**
+   * 指定した学期の履修数
+   *
+   * @param {number} s 学期
+   * @return {number} 履修数
+   */
+  function lectures_per_semester(s){
+    return num_semester = table().data().filter(function(e){
+      return (semester(e) == s) && e.result != null;
+    }).count();
+  }
+
+  /**
+   * 授業時間の重複を判定
+   *
+   * @param {Object} data1 重複を判定する授業
+   * @param {Object} data2 比較対象となる授業
+   * @return {boolean} 履修数
+   */
+  function is_collision(data1, data2){
+    return (data1.id != data2.id && data1.quarter == data2.quarter && (
+           (data1.week1 == data2.week1 && data1.hour1 == data2.hour1) ||
+            (data1.week1 == data2.week2 && data1.hour1 == data2.hour2) ||
+            (data1.week2 && data1.hour2 && (
+             (data1.week2 == data2.week1 && data1.hour2 == data2.hour1) ||
+             (data1.week2 == data2.week2 && data1.hour2 == data2.hour1)))));
+  }
+
+  /**
+   * データのリロード
+   *
+   */
+  function onReloadClick() {
+    table().ajax.reload(function(){
+      connect_resultbox_cb();
+      updateDOM()
+    });
+  }
+
+  /**
+   * データのセーブ
+   *
+   */
+  function onSaveClick() {
+    var data = {};
+    data.lectures = [];
+    table().data().each(function(e){
+      if(e.result != null){
+        data.lectures.push({id: e.id, result: e.result});
+      }
+    });
+    $.ajax({
+      type:"post",
+      url:"/lectures",
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("X-CSRF-Token", $('meta[name="csrf-token"]').attr('content'))
+      },
+    }).then(
+      function(data) { /* alert('success!!'); */ },
+      function(data) { /* alert('error!!');  */  }
+    );
+  }
+
+  /**
+   * 授業データ構造に合わせて画面を更新
+   *
+   */
+  function updateDOM(){
+    $("tbody tr").each(function(index, elm){
+      cur = table().row(this).data();
+      if(cur.result != null){
+        $(this).addClass("success");
+        $(this).find(".resultbox").css("visibility","visible");
+      } else {
+        $(this).removeClass("success");
+        $(this).find(".resultbox").css("visibility","hidden");
+        dup = table().data().filter(function(e){
+          return e.result != null && is_collision(cur, e);
+        }).count();
+        if(lectures_per_semester(semester(cur)) == 11 || dup > 0){
+          $(this).addClass("danger");
+        } else {
+          $(this).removeClass("danger");
+        }
+      }
+    });
+    for(i=1; i<7;i++){
+      c = "course" + i;
+      results =  table().data().filter(function(e){ return e.result >= 2 && e[c]; }).sort(function(e1,e2){return e2.result - e1.result;});
+      count = results.count();
+      avg = Math.round(Array.prototype.slice.call(results,0,7).reduce(function(prev, cur, i, arr) {
+        return prev+cur.result;
+      },0) / 7 *10)/10;
+      $("th."+c).find('span').text(`${count}(${avg})`);
+      if(count >= 7){
+        $("th."+c).addClass("success");
+        $("th."+c).removeClass("danger");
+      }else{
+        $("th."+c).removeClass("success");
+        $("th."+c).addClass("danger");
+      }
+    }
+  }
+
+  /**
+   * コース用レンダラ
+   *
+   * @param {Object} data rawデータ (true か false)
+   * @return {string} セルに描画する内容(〇か空)
+   */
+  function course_render(data){
+    return data ? "〇":"";
+  }
+
+  /**
+   * 成績用レンダラ
+   *
+   * @param {Object} data rawデータ (0～5 or null の成績データ)
+   * @return {string} セルに描画する内容(入力ボックスの html 断片)
+   */
+  function result_render(data){
+    return `<input class="resultbox" style="visibility:hidden;" type="number" step="1" min="0" max="5" value="${data != null?data:5}" size="1"/>`;
+  }
+
+  /**
+    * 成績入力箱変更コールバック
+    * 入力内容をバリデーションしてから画面更新
+    *
+    */
+  function connect_resultbox_cb(){
+    $(".resultbox").change(function(){
+      tr = $(this).closest('tr')[0];
+      data = table().row(tr).data();
+      if(parseInt($(this).val()) < 0 || parseInt($(this).val()) > 5){
+        $(this).val(data.result!=null?data.result:5);
+      }else{
+        data.result = parseInt($(this).val());
+        updateDOM();
+      }
+    });
+  }
+
+  /**
+   * DataTable 初期化処理
+   *
+   */
+  $("#lecture-table").DataTable({
+      ajax: '/lectures_data',
+
+      /**
+       * 初期化コールバック
+       * ajax で取り込んだ表の初期化が完了した時点で発火
+       *
+       */
+      initComplete: function(settings, json) {
+
+        /**
+         * 行クリックコールバック
+         * データ構造を更新してから画面更新
+         *
+         */
+        $("tbody").on("click", "td", function () {
+           if(!$(this).hasClass("result")){
+             tr = $(this).closest('tr')[0];
+             if($(tr).hasClass("success") || ! $(tr).hasClass("danger")){
+               data = table().row(tr).data();
+               data.result = data.result !=null ? null : 5;
+               updateDOM();
+             }
+          }
+          connect_resultbox_cb();
+        });
+        updateDOM();
+      },
+      columns: [
+        { title: "#", data: 'id' },
+        { title: "名称", data: 'name' },
+        { title: "Q", data: 'quarter' },
+        { title: "曜日", data: 'week1' },
+        { title: "時間", data: 'hour1' },
+        { title: "曜日", data: 'week2' },
+        { title: "時間", data: 'hour2' },
+        { title: "成績", data: 'result', className: "result", render: result_render },
+        { title: "ST<br/><span>0(0)</span>", data: 'course1', className: "course1", render: course_render },
+        { title: "SA<br/><span>0(0)</span>", data: 'course2', className: "course2", render: course_render },
+        { title: "PM<br/><span>0(0)</span>", data: 'course3', className: "course3", render: course_render },
+        { title: "SM<br/><span>0(0)</span>", data: 'course4', className: "course4", render: course_render },
+        { title: "TS<br/><span>0(0)</span>", data: 'course5', className: "course5", render: course_render },
+        { title: "BA<br/><span>0(0)</span>", data: 'course6', className: "course6", render: course_render },
+      ],
+      paging: false
+    });
+
+  /**
+   * 進む/戻る対策 検知したら reload する...
+   *
+   */
+  window.addEventListener('popstate',function(e){
+    if (e.state) {
+      location.reload();
+    }
+  });
+</script>
 <% else %>
     ログインしてね！
 <% end %>
-<script>
-    function getParams(row){
-        idx = row.index();
-        qtr = row.find(".quarter").text();
-        hlf = ((qtr == "1" || qtr == "2") ? "1": "2") + "h";
-        p1 = row.find(".week1").text() + row.find(".hour1").text();
-        p2 = row.find(".week2").text() + row.find(".hour2").text();
-        return {
-            idx: idx,
-            qtr: qtr,
-            hlf: hlf,
-            p1: p1,
-            p2: p2
-        };
-    }
-    function toggleCource(row, diff){
-        for(i=1; i<7;i++){
-            c = ".cource" + i;
-            if(row.find(c).text() == "◯"){
-                $("th"+c).data("num", $("th"+c).data("num") + diff);
-                console.log($("th"+c).data("num"));
-            }
-            if($("th"+c).data("num") >= 7){
-                $("th"+c).addClass("success");
-                $("th"+c).removeClass("danger");
-            }else{
-                $("th"+c).removeClass("success");
-                $("th"+c).addClass("danger");
-            }
-        }
-    }
-    function toggleRow(row){
-        diff = row.hasClass("success") ? -1 : 1;
-        sel = getParams(row);
-        $("tbody").data(sel.hlf, $("tbody").data(sel.hlf) + diff);
-        console.log(sel.hlf + " " + $("tbody").data(sel.hlf));
-        row.toggleClass("success");
-        toggleCource(row, diff);
-        $("tbody tr").each(function(index, elm){
-            if(index != idx){
-               cur = getParams($(this));
-               if(cur.qtr == sel.qtr){
-                   if(sel.p1 == cur.p1 || sel.p1 == cur.p2 || (sel.p2 != "" && (sel.p2 == cur.p1 ||sel.p2 == cur.p2))){
-                       $(this).data("dup", $(this).data("dup") + diff)
-                   }
-               }
-               if(! $(this).hasClass("success")){
-                   if($("tbody").data(cur.hlf) == 11 || $(this).data("dup") > 0){
-                       $(this).addClass("danger");
-                   } else {
-                       $(this).removeClass("danger");
-                   }
-               }
-            }
-        })
-    }
-    function clearHdr(hdr){
-        hdr.removeClass("danger");
-        hdr.removeClass("success");
-        hdr.data("num",0);
-    }
-    function clearRow(row){
-        row.removeClass("danger");
-        row.removeClass("success");
-        row.data("dup",0);
-    }
-    function clearTable(){
-        $("tbody").data("1h", 0);
-        $("tbody").data("2h", 0);
-        $("tbody tr").each(function(index, elm){
-            clearRow($(this));
-        });
-        $("thead th").each(function(index, elm){
-            clearHdr($(this));
-        });
-    }
-    function initTable(){
-        clearSummary()
-        $("tbody tr").each(function(index, elm){
-            if ($(this).hasClass("initial_select")){
-                toggleRow($(this));
-                setRowSummary(elm);
-            }
-        });
-    }
-    $("tbody").on("click", "tr", function () {
-       if($(this).hasClass("success") || ! $(this).hasClass("danger")){
-           toggleRow($(this));
-          setRowSummary(this);
-       }
-    });
-  function onReloadClick() {
-    clearTable();
-    initTable();
-  }
-  function onSaveClick() {
-    var lectures = [];
-    $("tbody tr").each(function(index, elm){
-        if($(this).hasClass("success")){
-            lectures.push($(this).find("th").text());
-        }
-    });
-    $.ajax({
-        type:"post",
-        url:"/lectures",
-        data: {lectures: lectures},
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("X-CSRF-Token", $('meta[name="csrf-token"]').attr('content'))
-        },
-    }).then(
-          function(data) { /* alert('success!!'); */ },
-          function(data) { /* alert('error!!');  */  }
-    );
-    $("tbody tr").each(function(index, elm){
-        if($(this).hasClass("success")){
-            $(this).addClass("initial_select");
-        }else{
-            $(this).removeClass("initial_select");
-        }
-    });
-  }
-  $(window).on('load',function(){
-      $("#lecture-table").DataTable({paging: false});
-      initTable();
-  });
-</script>
