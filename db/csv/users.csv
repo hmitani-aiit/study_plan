@@ -1,0 +1,14 @@
+id,name,email,created_at,updated_at,password_digest,remember_digest,admin
+3,Micro Same,microsam@aiit.ac.jp,2019-07-24 09:29:15.08488,2019-07-24 09:29:15.08488,$2a$10$urQ9TmzppAuyP2WzTxvJIeQmWlQJLzR8gpl3lobJyKZtI3jQOWbGK,,f
+4,aaaa,aa@aa.aa,2019-07-26 10:29:51.412812,2019-07-26 10:29:51.412812,$2a$10$2u2UC7JSvlIwGWTCVIfrGeDTAl4GrzPekN.bKNv8fv7I8LbivaLKO,,f
+5,Shingo Akagaki2,uganikov@gmail.com,2019-07-29 08:48:42.256787,2019-07-29 08:48:42.256787,$2a$10$yr30CfWPPneQ7VIn64Ccs.SeCS/EMGOQBfO1C5Bgs4FTg0yXyk4Fm,,f
+6,aaaa,aaaa@aa.aa,2019-07-30 00:33:20.683149,2019-07-30 00:33:20.683149,$2a$10$rmxwimdg/wbYzNamVRI7j.VHvAiXpzU4UraLADmg9fI1yCZ.Idxl2,,f
+9,a,a@aiit.ac.jp,2019-08-02 21:27:42.482958,2019-08-02 21:27:42.482958,$2a$10$wWTkuKCdnSGkbm1tDnuep.dWwSj2kXPg.rE1h7/L6UDc.iLJu37Ke,,f
+11,a,ab@aiit.ac.jp,2019-08-06 01:45:16.523006,2019-08-06 01:45:16.523006,$2a$10$wxHw2ItkpPZEGANHUtvJa..i45z9Tg4ygdfy5ZDpi4Au.z42UBdMy,,f
+12,hogehoge,hogehoge@exaple.com,2019-08-10 01:00:21.648587,2019-08-10 01:00:21.648587,$2a$10$erzzjcBPJykhN9aL5007pOcVgYWZOwZ9bYod9SqfUssmWQpJ9Mwzu,,f
+13,Foo bar,hogehogefoobar@exaple.com,2019-08-22 07:25:14.516417,2019-08-22 07:25:14.516417,$2a$10$ewLlEbB6YGDCsFjqRj3KE.MfEaWIYSxEpNSFn3U0GP84U.mXxcnRC,,f
+1,Shingo Akagaki,a1901sa@aiit.ac.jp,2019-07-18 11:30:09.879337,2019-08-30 10:35:22.097869,$2a$10$XQpqDBkEXyTCWhphfCBCIethZElOTqKA14h/qpjvUL94u8oPVgNni,,t
+2,sayaka,sasayakado@gmail.com,2019-07-18 12:18:44.134367,2019-08-30 10:35:33.718971,$2a$10$qfV/K/laTrtaLMeChQeOJuR04UJIktzZnspeUebuK4XvHU.Dim9Ey,,t
+7,MITANI Hiroyuki,a1941hm@aiit.ac.jp,2019-07-31 10:02:41.214686,2019-08-30 10:35:41.340635,$2a$10$2kbgqIKNaeXQlIGCyY8gm.dZ3gGu0pI8J9oQDdxDn1XfTKRzU8X5W,,t
+8,WANG ZEYA,a18z1zw@aiit.ac.jp,2019-08-02 09:42:01.598546,2019-08-30 10:35:45.99446,$2a$10$dzDIuc4FT6Tb.giKdMmHOODBmvJ23cTuhF6LJr47SdvtM68aAivxO,,t
+10,Ambe Hideki,a1902ha@aiit.ac.jp,2019-08-03 12:42:58.475474,2019-08-30 10:35:52.034561,$2a$10$vYL1n/jq4dV8Pp7ozPK7ceBW5p/ANglVg0Isk8rEIJuxy0A3TquOK,,t
