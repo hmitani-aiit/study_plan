@@ -4,7 +4,7 @@ require "csv"
 
 Cource.delete_all
 Week.delete_all
-Lecture.delete_all
+#Lecture.delete_all
 LecturePeriod.delete_all
 CourceLecture.delete_all
 
@@ -12,12 +12,16 @@ cource = {}
 week = {}
 
 CSV.foreach('db/cource.csv') do |row|
-  Cource.create(:id => row[0], :name => row[1])
+  Cource.where(:id => row[0]).first_or_create do |r|
+    r.name = row[1]
+  end
   cource.store(row[1], row[0])
 end
 
 CSV.foreach('db/week.csv') do |row|
-  Week.create(:id => row[0], :name => row[1])
+  Week.where(:id => row[0]).first_or_create do |r|
+    r.name = row[1]
+  end
   week.store(row[1], row[0])
 end
 
@@ -25,7 +29,10 @@ lecture_id = 1
 CSV.foreach('db/lecture.csv') do |row|
   lecture_name = row[0]
   quarter = row[1]
-  Lecture.create(:id => lecture_id, :name => lecture_name, :quarter => quarter)
+  Lecture.where(:id => lecture_id).first_or_create do |r|
+     r.name = lecture_name
+     r.quarter = quarter
+  end
 
   lecture_count = row[2].to_i
 
@@ -37,7 +44,7 @@ CSV.foreach('db/lecture.csv') do |row|
     column += 1
     period = row[column]
     column += 1
-    LecturePeriod.create(:lecture_id => lecture_id, :day_of_the_week => week_id, :period => period)
+    LecturePeriod.where(:lecture_id => lecture_id, :day_of_the_week => week_id, :period => period).first_or_create
     count += 1
   end
 
@@ -49,7 +56,7 @@ CSV.foreach('db/lecture.csv') do |row|
     cource_name = row[column]
     cource_id = cource[cource_name]
 
-    CourceLecture.create(:cource_id => cource_id, :lecture_id => lecture_id)
+    CourceLecture.where(:cource_id => cource_id, :lecture_id => lecture_id).first_or_create
     count += 1
     column += 1
   end
