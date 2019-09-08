@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  devise :trackable, :omniauthable, omniauth_providers: %i(google)
   attr_accessor :remember_token
   before_save { self.email = email.downcase }
   validates :name,  presence: true, length: { maximum: 50 }
@@ -39,5 +40,22 @@ class User < ApplicationRecord
   # ユーザーのログイン情報を破棄する
   def forget
     update_attribute(:remember_digest, nil)
+  end
+
+  # googleログイン認証を行う。
+  protected
+  def self.find_for_google(auth)
+    user = User.find_by(email: auth.info.email)
+
+    unless user
+      user = User.create(name:     auth.info.name,
+                         email: auth.info.email,
+                         provider: auth.provider,
+                         uid:      auth.uid,
+                         token:    auth.credentials.token,
+                         password: Devise.friendly_token[0, 20],
+                         meta:     auth.to_yaml)
+    end
+    user
   end
 end

@@ -28,3 +28,6 @@
 test/controllers/default:
 default:
 vagrant:
+
+# Ignore environment
+/.env

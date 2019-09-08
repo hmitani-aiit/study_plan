@@ -5,12 +5,24 @@
     <title><%= full_title(yield(:title)) %></title>
   </head>
   <body>
-    <h1>履修計画</h1>
-<div class="center jumbotron">
-  <h1>履修計画へようこそ</h1>
 
-  <%= link_to "Sign up now!", signup_path, class: "btn btn-lg btn-primary" %>
-</div>
+    <% if logged_in? %>
+      <div class="center jumbotron">
+      <div class="gravatar_edit">
+        <h1><%= @current_user.name %><br> Welcom to 履修計画</h1>
+        <%= gravatar_for @current_user %>
+        <a href="http://gravatar.com/emails" target="_blank">change avatar</a><br><br><br><br>
+        <%= link_to "Log out", logout_path, class: "btn btn-lg btn-primary", method: :delete %><br>
+   </div>
+   </div>
+
+  <% else %>
+   <div class="center jumbotron">
+     <h1>Welcom to 履修計画<h1>
+     <h4>Please Log in with aiit ID<h4>
+     <%= link_to "Log in", user_google_omniauth_authorize_path, class: "btn btn-lg btn-primary" %>
+   </div>
+  <% end %>
 
 <%= link_to image_tag("rails.png", alt: "Rails logo"),
             'http://rubyonrails.org/' %>
